@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contagem de Bags</title>
+    <link rel="stylesheet" href="/static/styles/contagem.css">
+    <link rel="stylesheet" href="/static/styles/checkBoxContagem.css">
+    <style>
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="popup">
+        <form class="form" action="/save_number" method="POST" id="form">
+            <div class="note">
+                <label class="title">Bags:</label>
+                <span class="subtitle"></span>
+            </div>
+            <input 
+                placeholder="Quantia de Bags" 
+                title="number-bags" 
+                name="number" 
+                id="numberInput" 
+                type="number" 
+                class="input_field" 
+                required 
+                min="1" 
+                max="20" 
+                step="1">
+            <input 
+                placeholder="Peso das Bags" 
+                title="peso_bag" 
+                name="peso_bag" 
+                id="pesoInput" 
+                type="text" 
+                class="input_field" 
+                required>
+            <div class="checkbox-container">
+                <div class="checkbox-wrapper-4">
+                    <input 
+                        type="checkbox" 
+                        id="morning" 
+                        name="time_option" 
+                        value="morning" 
+                        class="inp-cbx" />
+                    <label for="morning" class="cbx">
+                        <span><svg height="10px" width="12px"><use xlink:href="#check-4"></use></svg></span>
+                        <span>Pet</span>
+                    </label>
+                </div>
+                <div class="checkbox-wrapper-4">
+                    <input 
+                        type="checkbox" 
+                        id="afternoon" 
+                        name="time_option" 
+                        value="afternoon" 
+                        class="inp-cbx" />
+                    <label for="afternoon" class="cbx">
+                        <span><svg height="10px" width="12px"><use xlink:href="#check-4"></use></svg></span>
+                        <span>Pad</span>
+                    </label>
+                </div>
+                <div class="checkbox-wrapper-4">
+                    <input 
+                        type="checkbox" 
+                        id="evening" 
+                        name="time_option" 
+                        value="evening" 
+                        class="inp-cbx" />
+                    <label for="evening" class="cbx">
+                        <span><svg height="10px" width="12px"><use xlink:href="#check-4"></use></svg></span>
+                        <span>PP</span>
+                    </label>
+                </div>
+                <svg class="inline-svg">
+                    <symbol viewBox="0 0 12 10" id="check-4">
+                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                    </symbol>
+                </svg>
+            </div>
+            <button class="submit" type="submit">Próximo</button>
+            <div id="error-message" class="error-message"></div>
+        </form>
+    </div>
+</div>
+<script>
+    // Função para garantir que apenas números e ponto sejam inseridos no campo Peso das Bags
+    document.getElementById('pesoInput').addEventListener('input', function(event) {
+        const value = event.target.value;
+        // Permite apenas números e ponto decimal
+        if (!/^[0-9]*\.?[0-9]*$/.test(value)) {
+            event.target.value = value.replace(/[^0-9.]/g, ''); // Remove caracteres não permitidos
+        }
+    });
+
+    // Função para garantir que apenas números válidos sejam inseridos no campo Quantia de Bags
+    document.getElementById('numberInput').addEventListener('input', function(event) {
+        const value = event.target.value;
+        if (!/^\d*$/.test(value)) {
+            event.target.value = value.replace(/\D/g, ''); // Remove qualquer caractere não numérico
+        }
+    });
+
+    // Função para garantir que apenas uma checkbox esteja marcada
+    document.querySelectorAll('.inp-cbx').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                document.querySelectorAll('.inp-cbx').forEach(otherCheckbox => {
+                    if (otherCheckbox !== this) {
+                        otherCheckbox.checked = false;
+                    }
+                });
+            }
+        });
+    });
+
+    // Função para validação do formulário
+    document.getElementById('form').addEventListener('submit', function(event) {
+        let valid = true;
+        let errorMessage = '';
+
+        // Verificar se todos os campos obrigatórios estão preenchidos
+        const numberInput = document.getElementById('numberInput').value.trim();
+        const pesoInput = document.getElementById('pesoInput').value.trim();
+        const checkboxes = document.querySelectorAll('.inp-cbx');
+        const anyCheckboxChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+
+        // Verificar se o valor de "Quantia de Bags" está dentro do intervalo permitido
+        const numberInputValue = parseInt(numberInput, 10);
+        if (isNaN(numberInputValue) || numberInputValue < 1 || numberInputValue > 20) {
+            valid = false;
+            errorMessage += 'A Quantia de Bags deve estar entre 1 e 20.\n';
+        }
+
+        if (!numberInput || !pesoInput) {
+            valid = false;
+            errorMessage += 'Todos os campos obrigatórios devem ser preenchidos.\n';
+        }
+
+        if (!anyCheckboxChecked) {
+            valid = false;
+            errorMessage += 'Pelo menos uma opção deve ser selecionada.\n';
+        }
+
+        if (!valid) {
+            event.preventDefault(); // Impede o envio do formulário
+            document.getElementById('error-message').innerText = errorMessage;
+        } else {
+            document.getElementById('error-message').innerText = ''; // Limpa a mensagem de erro
+        }
+    });
+</script>
+</body>
+</html>

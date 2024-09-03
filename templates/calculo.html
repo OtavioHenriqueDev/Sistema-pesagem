@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesagem</title>
+    <link rel="stylesheet" href="/static/styles/calculo.css">
+    <style>
+        .input_field {
+            margin-bottom: 10px;
+            padding: 5px;
+            width: 100px;
+        }
+        .submit {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <div class="popup">
+        <label class="title">Coloque o peso de cada bag abaixo:</label>
+        <form class="form" action="/save_weights" method="POST" id="weightsForm">
+          {% for i in range(number) %}
+            <label for="input{{ i }}">Bag {{ i+1 }}:</label>
+            <input type="text" id="input{{ i }}" name="input{{ i }}" class="input_field" required><br>
+          {% endfor %}
+          <button class="submit" type="submit">Somar</button>
+          <div id="error-message" class="error-message"></div>
+        </form>
+    </div>
+  </div>
+  <script>
+    // Função para garantir que apenas números e pontos sejam inseridos
+    document.querySelectorAll('.input_field').forEach(input => {
+        input.addEventListener('input', function(event) {
+            const value = event.target.value;
+            // Permite apenas números e ponto decimal
+            if (!/^[0-9]*\.?[0-9]*$/.test(value)) {
+                event.target.value = value.replace(/[^0-9.]/g, ''); // Remove caracteres não permitidos
+            }
+        });
+    });
+
+    // Função para validação do formulário
+    document.getElementById('weightsForm').addEventListener('submit', function(event) {
+        let valid = true;
+        let errorMessage = '';
+
+        // Verificar se todos os campos obrigatórios estão preenchidos
+        document.querySelectorAll('.input_field').forEach(input => {
+            if (!input.value.trim()) {
+                valid = false;
+                errorMessage = 'Todos os campos devem ser preenchidos.\n';
+            }
+        });
+
+        if (!valid) {
+            event.preventDefault(); // Impede o envio do formulário
+            document.getElementById('error-message').innerText = errorMessage;
+        } else {
+            document.getElementById('error-message').innerText = ''; // Limpa a mensagem de erro
+        }
+    });
+    </script>
+</body>
+</html>
